@@ -21,12 +21,11 @@ def get_joints_in_hierarchy(node):
         if cmds.nodeType(child) == "joint":  # Joint の場合のみ追加
             joints.append(child)
         joints.extend(get_joints_in_hierarchy(child))  # 再帰的に子ノードを探索
-    
     return joints
 
-# 選択オブジェクトの最上位ルートを取得し、そこから階層全体の Joint を取得
-selected = cmds.ls(selection=True, long=True)  # `long=True` でフルパス取得
 
+    # 選択オブジェクトの最上位ルートを取得し、そこから階層全体の Joint を取得
+selected = cmds.ls(selection=True, long=True)  # `long=True` でフルパス取得
 if selected:
     root_nodes = set()  # 重複を防ぐためセットを使用
     for obj in selected:
@@ -35,6 +34,6 @@ if selected:
     all_joints = []
     for root in root_nodes:
         all_joints.extend(get_joints_in_hierarchy(root))  # ルートから探索
-
-    print(f"階層全体の Joint ノード: {all_joints}")
-    cmds.select(all_joints, replace=True)  # 取得したジョイントを選択
+    filtered = [j for j in all_joints if "_s" not in j.split('|')[-1]]
+    all_joints = filtered  # フィルタリングされたジョイントを使う
+    
