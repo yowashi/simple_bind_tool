@@ -1,12 +1,12 @@
 from maya import cmds
 import os
 import re
-from PySide2 import QtWidgets
-from PySide2.QtUiTools import QUiLoader
+from PySide6 import QtWidgets
+from PySide6.QtUiTools import QUiLoader
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
 
 # 絶対パスで設定 ※可能なら相対パスで処理できるようにしたい。
-UIFILEPATH = r"C:\Users\hinzy\OneDrive\デスクトップ\simple_bind_tool\SBT_Qt2.ui"
+UIFILEPATH = r"F:\3D\Maya_dev\SBT_Qt2.ui"
 
 class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
@@ -37,7 +37,7 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.widget.remove_influence_btn_2.clicked.connect(self.remove_influence_function)
         self.widget.hair_bind_btn.clicked.connect(self.hair_bind_function)
         self.widget.create_linobj_btn.clicked.connect(self.create_line_obj)
-        #self.widget.export_obj_btn.clicked.connect(self.export_obj_function)
+        self.widget.vertex_btn.clicked.connect(self.create_line_obj)
 
         self.logs = []
 
@@ -155,11 +155,11 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.log_message(bind_mesh)
         source = cmds.listHistory(source_mesh, pdo= True)
         skin = cmds.ls(source, typ= "skinCluster")
-        
+
         if not skin:
             self.log_message("The first object to be selected is object with skinCluster.")
             return
-        
+
         if self.widget.bind_body_btn.isChecked():
             bind_sets_joint = self.select_sets_bodyonly()
 
@@ -175,7 +175,7 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         else:
             self.log_message("Error: No set selection made.")
             return
-        
+
         if not bind_sets_joint:
             self.log_message("Error: No joints selected for binding.")
             return
@@ -237,6 +237,14 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
             filtered = [j for j in all_joints if "_s" not in j.split('|')[-1]]
             all_joints = filtered  # フィルタリングされたジョイントを使う
             self.bind_setting(all_joints, selected)
+
+    def trancefer_vertex(self):
+        selected = cmds.ls(selection=True, flatten=True)
+        if len(selected) != 2:
+            self.log_message("Select two objects or vertices (source → target)")
+            return
+        source_mesh, target_mesh = selected
+        
 
 
     """--------- ボタン機能 ---------"""
