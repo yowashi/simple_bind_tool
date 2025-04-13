@@ -1,12 +1,12 @@
 from maya import cmds
 import os
 import re
-from PySide6 import QtWidgets
-from PySide6.QtUiTools import QUiLoader
+from PySide2 import QtWidgets
+from PySide2.QtUiTools import QUiLoader
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
 
 # 絶対パスで設定 ※可能なら相対パスで処理できるようにしたい。
-UIFILEPATH = r"F:\Maya_dev\SBT_Qt2.ui"
+UIFILEPATH = r"C:\Users\hinzy\OneDrive\デスクトップ\simple_bind_tool\SBT_Qt2.ui"
 
 class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
@@ -28,10 +28,13 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.widget.bindskin_btn.clicked.connect(self.bind_skin_function)
         self.widget.unbind_btn.clicked.connect(self.unbind_skin_function)
         self.widget.copyskin_obj.clicked.connect(self.copyskin_function)
+        self.widget.copyskin_obj_2.clicked.connect(self.copyskin_function)
         self.widget.copyskin_ver.clicked.connect(self.copyskin_function)
         self.widget.bind_copy_btn.clicked.connect(self.bind_copy_function)
         self.widget.delete_history_btn.clicked.connect(self.delete_history_function)
+        self.widget.delete_history_btn_2.clicked.connect(self.delete_history_function)
         self.widget.remove_influence_btn.clicked.connect(self.remove_influence_function)
+        self.widget.remove_influence_btn_2.clicked.connect(self.remove_influence_function)
         self.widget.hair_bind_btn.clicked.connect(self.hair_bind_function)
         self.widget.create_linobj_btn.clicked.connect(self.create_line_obj)
         #self.widget.export_obj_btn.clicked.connect(self.export_obj_function)
@@ -372,19 +375,20 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
             base_name = selected[0].split("|")[-1]  # 最後の部分を取得
             new_name = base_name + "_line"
             duplicate_obj = cmds.duplicate(selected[0], name=new_name)  # 複製
-            cmds.polyNormal(duplicate_obj[0], normalMode=0)  # 法線を揃える
             cmds.polySoftEdge(duplicate_obj[0], angle=180)
             cmds.delete(duplicate_obj[0], ch=True)  # 履歴を削除
             line_obj = cmds.ls(duplicate_obj[0])
             self.hair_bind_setting(line_obj)  # バインド設定
-            cmds.copySkinWeights(
-                sourceSkin=selected[0],
-                destinationSkin=line_obj[0],
-                noMirror=True,
-                surfaceAssociation='closestPoint',
-                influenceAssociation='closestJoint'
-            )
 
+            source_skin_cluster = cmds.ls(cmds.listHistory(selected[0]), type="skinCluster")[0]
+            target_skin_cluster = cmds.ls(cmds.listHistory(line_obj[0]), type="skinCluster")[0]
+            cmds.copySkinWeights(
+                sourceSkin=source_skin_cluster,
+                destinationSkin=target_skin_cluster,
+                noMirror=True,
+                surfaceAssociation="closestPoint",
+                influenceAssociation="closestJoint"
+            )
         else:
             self.log_message("No object selected for line creation.")
         self.log_message("Line object created and bound successfully.")

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Sinple_Bind_Tool</class>
- <widget class="QWidget" name="Sinple_Bind_Tool">
+ <class>Sinple_Setup_Tool</class>
+ <widget class="QWidget" name="Sinple_Setup_Tool">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,13 +17,13 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>SinpleBindTool</string>
+   <string>SinpleSetupTool</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="body">
       <property name="minimumSize">
@@ -168,9 +168,9 @@
       <attribute name="title">
        <string>hair/export(開発中)</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
@@ -185,10 +185,6 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -205,7 +201,39 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QPushButton" name="copyskin_obj_2">
+           <property name="text">
+            <string>Copy Skin Weight</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QPushButton" name="remove_influence_btn_2">
+             <property name="text">
+              <string>Remove Influence</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="delete_history_btn_2">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string>Delete Nondeformer History</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0" colspan="2">
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
