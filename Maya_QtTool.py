@@ -4,15 +4,18 @@ import re
 from PySide6 import QtWidgets
 from PySide6.QtUiTools import QUiLoader
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
+import inspect
 
-# 絶対パスで設定 ※可能なら相対パスで処理できるようにしたい。
-UIFILEPATH = r"F:\Maya_dev\SBT_Qt2.ui"
+script_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+UI_FILENAME = "SBT_Qt2.ui"
+UI_FILEPATH = os.path.join(script_dir, UI_FILENAME)
+
 
 class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(Simple_Bind_Tool, self).__init__(*args, **kwargs)
 
-        self.widget = QUiLoader().load(UIFILEPATH)
+        self.widget = QUiLoader().load(UI_FILEPATH)
         self.setWindowTitle("Simple_Bind_Tool")
         self.setCentralWidget(self.widget)
 
@@ -28,14 +31,16 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.widget.bindskin_btn.clicked.connect(self.bind_skin_function)
         self.widget.unbind_btn.clicked.connect(self.unbind_skin_function)
         self.widget.copyskin_obj.clicked.connect(self.copyskin_function)
+        self.widget.copyskin_obj_2.clicked.connect(self.copyskin_function)
         self.widget.copyskin_ver.clicked.connect(self.copyskin_function)
         self.widget.bind_copy_btn.clicked.connect(self.bind_copy_function)
         self.widget.delete_history_btn.clicked.connect(self.delete_history_function)
+        self.widget.delete_history_btn_2.clicked.connect(self.delete_history_function)
         self.widget.remove_influence_btn.clicked.connect(self.remove_influence_function)
+        self.widget.remove_influence_btn_2.clicked.connect(self.remove_influence_function)
         self.widget.hair_bind_btn.clicked.connect(self.hair_bind_function)
         self.widget.create_linobj_btn.clicked.connect(self.create_line_obj)
-        #self.widget.export_obj_btn.clicked.connect(self.export_obj_function)
-
+        
         self.logs = []
 
     def log_message(self, message):
@@ -152,11 +157,11 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.log_message(bind_mesh)
         source = cmds.listHistory(source_mesh, pdo= True)
         skin = cmds.ls(source, typ= "skinCluster")
-        
+
         if not skin:
             self.log_message("The first object to be selected is object with skinCluster.")
             return
-        
+
         if self.widget.bind_body_btn.isChecked():
             bind_sets_joint = self.select_sets_bodyonly()
 
@@ -172,7 +177,7 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         else:
             self.log_message("Error: No set selection made.")
             return
-        
+
         if not bind_sets_joint:
             self.log_message("Error: No joints selected for binding.")
             return
@@ -234,6 +239,14 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
             filtered = [j for j in all_joints if "_s" not in j.split('|')[-1]]
             all_joints = filtered  # フィルタリングされたジョイントを使う
             self.bind_setting(all_joints, selected)
+
+    def trancefer_vertex(self):
+        selected = cmds.ls(selection=True, flatten=True)
+        if len(selected) != 2:
+            self.log_message("Select two objects or vertices (source → target)")
+            return
+        source_mesh, target_mesh = selected
+        
 
 
     """--------- ボタン機能 ---------"""
@@ -372,19 +385,20 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
             base_name = selected[0].split("|")[-1]  # 最後の部分を取得
             new_name = base_name + "_line"
             duplicate_obj = cmds.duplicate(selected[0], name=new_name)  # 複製
-            cmds.polyNormal(duplicate_obj[0], normalMode=0)  # 法線を揃える
             cmds.polySoftEdge(duplicate_obj[0], angle=180)
             cmds.delete(duplicate_obj[0], ch=True)  # 履歴を削除
             line_obj = cmds.ls(duplicate_obj[0])
             self.hair_bind_setting(line_obj)  # バインド設定
-            cmds.copySkinWeights(
-                sourceSkin=selected[0],
-                destinationSkin=line_obj[0],
-                noMirror=True,
-                surfaceAssociation='closestPoint',
-                influenceAssociation='closestJoint'
-            )
 
+            source_skin_cluster = cmds.ls(cmds.listHistory(selected[0]), type="skinCluster")[0]
+            target_skin_cluster = cmds.ls(cmds.listHistory(line_obj[0]), type="skinCluster")[0]
+            cmds.copySkinWeights(
+                sourceSkin=source_skin_cluster,
+                destinationSkin=target_skin_cluster,
+                noMirror=True,
+                surfaceAssociation="closestPoint",
+                influenceAssociation="closestJoint"
+            )
         else:
             self.log_message("No object selected for line creation.")
         self.log_message("Line object created and bound successfully.")

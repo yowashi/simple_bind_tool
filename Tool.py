@@ -1,0 +1,1 @@
+import Maya_QtTool; Maya_QtTool.main()
