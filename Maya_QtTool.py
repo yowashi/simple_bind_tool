@@ -4,15 +4,18 @@ import re
 from PySide6 import QtWidgets
 from PySide6.QtUiTools import QUiLoader
 from maya.app.general.mayaMixin import MayaQWidgetBaseMixin
+import inspect
 
-# 絶対パスで設定 ※可能なら相対パスで処理できるようにしたい。
-UIFILEPATH = r"F:\3D\Maya_dev\SBT_Qt2.ui"
+script_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+UI_FILENAME = "SBT_Qt2.ui"
+UI_FILEPATH = os.path.join(script_dir, UI_FILENAME)
+
 
 class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(Simple_Bind_Tool, self).__init__(*args, **kwargs)
 
-        self.widget = QUiLoader().load(UIFILEPATH)
+        self.widget = QUiLoader().load(UI_FILEPATH)
         self.setWindowTitle("Simple_Bind_Tool")
         self.setCentralWidget(self.widget)
 
@@ -37,8 +40,7 @@ class Simple_Bind_Tool(MayaQWidgetBaseMixin, QtWidgets.QMainWindow):
         self.widget.remove_influence_btn_2.clicked.connect(self.remove_influence_function)
         self.widget.hair_bind_btn.clicked.connect(self.hair_bind_function)
         self.widget.create_linobj_btn.clicked.connect(self.create_line_obj)
-        self.widget.vertex_btn.clicked.connect(self.create_line_obj)
-
+        
         self.logs = []
 
     def log_message(self, message):
